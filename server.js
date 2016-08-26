@@ -62,13 +62,37 @@ app.get('/scrape', function(req, res){
 			result.title = $(this).find('h2.post_title').text(); 
 			result.paragraph = $(this).find('p.intro').text();
 
-			console.log("Article " + i + "\n" + result.title + "\n" +  result.paragraph);
+			// console.log("Article " + i + "\n" + result.title + "\n" +  result.paragraph);
+
+			var entry = new Article(result); 
+
+			entry.save(function(err, doc){
+				if(err){
+					console.log(err);
+				}
+				else{
+					console.log(doc);
+				}
+			});
 
 		});
 	});
+	res.send("Scrape Complete!");
 });
 
-
+//	GETs scraped articles from mongoDB
+app.get('/articles/:id', function(req, res){
+	Article.findOne({'_id': req.params.id})
+	.populate('note')
+	.exec(function(err, doc){
+		if(err){
+			console.log(err);
+		}
+		else{
+			res.json(doc);
+		}
+	});
+});
 
 
 
